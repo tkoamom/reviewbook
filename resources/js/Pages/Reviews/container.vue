@@ -2,6 +2,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ReviewsContainer from "@/Pages/Reviews/reviewsContainer.vue";
 import InputReview from "@/Pages/Reviews/inputReview.vue";
+import {TailwindPagination} from "laravel-vue-pagination"
 </script>
 
 <template>
@@ -15,7 +16,8 @@ import InputReview from "@/Pages/Reviews/inputReview.vue";
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <reviews-container :reviews="reviews" :reviewAnswers="reviewAnswers" />
+                    <reviews-container v-on:reviewAnswerSent="getReviewAnswers()" :reviews="reviews.data" :reviewAnswers="reviewAnswers" :user="user"/>
+                    <tailwind-pagination :data="reviews" @pagination-change-page="getReviews"></tailwind-pagination>
                     <input-review
                         v-on:reviewsent="getReviews()"/>
                 </div>
@@ -28,7 +30,8 @@ import InputReview from "@/Pages/Reviews/inputReview.vue";
     export default {
         data: function (){
             return {
-                reviews: [],
+                user: null,
+                reviews: {},
                 reviewAnswers: []
             }
         },
@@ -44,10 +47,8 @@ import InputReview from "@/Pages/Reviews/inputReview.vue";
                         Notification.requestPermission( permission => {
                             let notification = new Notification('Awesome Website', {
                                 body: e.review.id,
-                                icon: "https://pusher.com/static_logos/320x320.png" // optional image url
+                                icon: "https://pusher.com/static_logos/320x320.png"
                             });
-
-                            // link to page on clicking the notification
                             notification.onclick = () => {
                                 window.open(window.location.href);
                             };
@@ -55,29 +56,8 @@ import InputReview from "@/Pages/Reviews/inputReview.vue";
                         vm.getReviews();
                     });
             },
-            listenForChanges() {
-                Echo.channel('contact-form')
-                    .listen('MessagePublished', post => {
-                        if (! ('Notification' in window)) {
-                            alert('Web Notification is not supported');
-                            return;
-                        }
-
-                        Notification.requestPermission( permission => {
-                            let notification = new Notification('Awesome Website', {
-                                body: post.message,
-                                icon: "https://pusher.com/static_logos/320x320.png" // optional image url
-                            });
-
-                            // link to page on clicking the notification
-                            notification.onclick = () => {
-                                window.open(window.location.href);
-                            };
-                        });
-                    })
-            },
-            getReviews() {
-                axios.get('/reviews_data')
+            getReviews(page=1) {
+                axios.get(`/reviews_data?page=${page}`)
                     .then( response => {
                         this.reviews = response.data;
                     })
@@ -93,12 +73,24 @@ import InputReview from "@/Pages/Reviews/inputReview.vue";
                     .catch(error => {
                         console.log(error);
                     })
+            },
+            getUser() {
+                axios.get('/user_data')
+                    .then( response => {
+                        this.user = response.data;
+                        console.log(response.data)
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
             }
         },
         created() {
+            this.getUser();
             this.getReviews();
             this.getReviewAnswers();
             this.connect();
+
         }
     }
 </script>

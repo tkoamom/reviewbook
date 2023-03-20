@@ -26,7 +26,7 @@ export default {
     },
     methods: {
         sendReview() {
-            if (this.message == ' '){
+            if (this.review == ' '){
                 return
             }
             axios.post('/review_send', {

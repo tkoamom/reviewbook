@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Auth;
 class ReviewController extends Controller
 {
     public function reviews(Request $request){
-        return Review::orderBy('created_at', 'DESC')->get();
+        return Review::orderBy('created_at', 'DESC')->paginate(10);
+    }
+
+    public function reviewAnswer (){
+        return $this->belongsTo('App\Models\ReviewAnswer');
     }
 
     public function newReview (Request $request){

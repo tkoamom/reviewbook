@@ -20,6 +20,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\NewReview' => [
             'App\Listeners\NewReviewNotification'
+        ],
+        'App\Events\NewReviewAnswer' => [
+            'App\Listeners\NewReviewAnswerNotification'
         ]
     ];
 

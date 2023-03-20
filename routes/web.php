@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -33,10 +34,12 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
     Route::get('/reviews', function () {
-        return Inertia::render('Reviews/container');
+        return Inertia::render('Reviews/container')->with('user', Auth::user());
     })->name('reviews');
 });
 
 Route::middleware('auth:sanctum')->get('/reviews_data', [\App\Http\Controllers\ReviewController::class, 'reviews']);
 Route::middleware('auth:sanctum')->get('/reviews_answers_data', [\App\Http\Controllers\ReviewAnswerController::class, 'answers']);
 Route::middleware('auth:sanctum')->post('/review_send', [\App\Http\Controllers\ReviewController::class, 'newReview']);
+Route::middleware('auth:sanctum')->post('/review_answer_send', [\App\Http\Controllers\ReviewAnswerController::class, 'newReviewAnswer']);
+Route::middleware('auth:sanctum')->get('/user_data', [\App\Http\Controllers\UserController::class, 'user']);

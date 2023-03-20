@@ -22,3 +22,9 @@ Broadcast::channel('reviews-channel', function ($user) {
         return ['id' => $user->id, 'name' => $user->name];
     }
 });
+
+Broadcast::channel('review.{reviewId}', function ($user, $reviewId) {
+    if (Auth::check()){
+        return ['id' => $user->id, 'name' => $user->name];
+    }
+});
